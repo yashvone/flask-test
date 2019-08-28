@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {box-sizing: border-box}
+body {font-family: "Lato", sans-serif;}
+
+.container{
+  display:table;
+  width:100%;
+  height:auto;
+  overflow:auto;
+}
+
+input[type=text], select, textarea, datetime-local {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+} 
+
+label {
+  padding: 12px 12px 12px 0;
+  display: inline-block;
+}
+
+form{
+  box-sizing: border-box;
+  width: max-content;
+  text-align: left;
+  border: 1px solid #ccc;
+  padding: 5px;
+  display: inline-block;
+}
+
+input[type=submit] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+/* Style the tab */
+.tab {
+  float: left;
+  display: table-row;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  width: auto;
+  height: 100%;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  display: block;
+  background-color: inherit;
+  color: black;
+  padding: 22px 16px;
+  width: 100%;
+  border: none;
+  outline: none;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  float: left;
+  display: table-row;
+  padding: 0px 12px;
+  border: 1px solid #ccc;
+  border-bottom:none;
+  width: 85%;
+  text-align: center;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+
+<h2>HouseKeeping API</h2>
+<p>Click on the methods to select one</p>
+<div class = "container">
+<div class="tab">
+  <button class="tablinks" onclick="openbutton(event, 'add-asset')" id="defaultOpen">Add asset</button>
+  <button class="tablinks" onclick="openbutton(event, 'add-task')">Add task</button>
+  <button class="tablinks" onclick="openbutton(event, 'add-worker')">Add worker</button>
+  <button class="tablinks" onclick="openbutton(event, 'assets')">List Assets</button>
+  <button class="tablinks" onclick="openbutton(event, 'allocate')">Allocate Task</button>
+  <button class="tablinks" onclick="openbutton(event, 'worker-tasks')">Get tasks for worker</button>
+</div>
+
+<div id="add-asset" class="tabcontent">
+  <h3>Add Asset</h3>
+  <form action = '/add-asset' method="POST">
+    <label for="assetid">Name of the Asset</label>
+    <input type="text" id="assetid" name="assetid" placeholder="Enter the ID of asset here..">
+    <br><br><input type="submit" value="Submit">
+  </form>
+</div>
+
+<div id="add-task" class="tabcontent">
+  <h3>Add Task</h3>
+  <form action = '/add-task' method="POST">
+    <label for="taskid">Name of the Task</label>
+    <input type="text" id="taskid" name="taskid" placeholder="Enter the ID of task here..">
+    <br><br><input type="submit" value="Submit">
+  </form> 
+</div>
+
+<div id="add-worker" class="tabcontent">
+  <h3>Add worker</h3>
+  <form action = '/add-worker' method="POST">
+    <label for="workerid">ID of the Worker</label>
+    <input type="text" id="workerid" name="workerid" placeholder="Enter the ID of worker here..">
+    <br><br><input type="submit" value="Submit">
+  </form>
+</div>
+
+<div id="assets" class="tabcontent">
+  <h3>List of all assets</h3>
+  <br>
+  <label for="asset">Click submit to view list of all assets.</label>
+  <br><br>
+  <a href=" assets/all"><input type="submit" value="Submit"></a>
+</div>
+
+<div id="allocate" class="tabcontent">
+  <h3>Allocate task</h3>
+  <form action = '/allocate-task' method="POST">
+    <label for="assetid">ID of the Asset</label>
+    <select name="assetid" required>
+      {% for i in assets %}
+        <option value={{i}}>{{i}}</option>
+      {% endfor %}
+      </select>
+    <br><br>
+    <label for="taskid">ID of the task</label>
+    <select name="taskid" required>
+      {% for i in tasks %}
+        <option value={{i}}>{{i}}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+    <label for="workerid">ID of the Worker</label>
+    <select name="workerid" required>
+      {% for i in workers %}
+        <option value={{i}}>{{i}}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+    <label for taskToBePerformedBy>Task Deadline</label>
+    <br>
+    <input type="datetime-local" name="taskToBePerformedBy" required>
+    <br><br><input type="submit" value="Submit">
+  </form>
+</div>
+
+<div id="worker-tasks" class="tabcontent">
+  <h3>Get tasks for worker</h3>
+  <form action = '/get-tasks-for-worker' method="POST">
+    <label for="workerid">ID of the Worker</label>
+    <select name="workerid" required>
+      {% for i in workers %}
+        <option value={{i}}>{{i}}</option>
+      {% endfor %}
+    </select>
+    <br><br><input type="submit" value="Submit">
+  </form>
+</div>
+</div>
+<script>
+function openbutton(evt, eventName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(eventName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+</script>
+   
+</body>
+</html> 
